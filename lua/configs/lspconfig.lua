@@ -1,52 +1,34 @@
--- load defaults i.e lua_lsp
+local vim = vim
 require("nvchad.configs.lspconfig").defaults()
 
-local nvlsp = require "nvchad.configs.lspconfig"
-local lspconfig = require "lspconfig"
-local vim = vim
-
-nvlsp.defaults()
+vim.lsp.set_log_level("debug")
 
 
-lspconfig.gopls.setup {}
-
-lspconfig.lua_ls.setup {
-  on_init = function(client)
-    if client.workspace_folders then
-      local path = client.workspace_folders[1].name
-      if vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc') then
-        return
-      end
-    end
-
-    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-      runtime = {
-        -- Tell the language server which version of Lua you're using
-        -- (most likely LuaJIT in the case of Neovim)
-        version = 'LuaJIT'
+local lspconfig = require("lspconfig")
+lspconfig.gopls.setup({
+  settings = {
+    gopls = {
+      completeUnimported = true,
+      usePlaceholders = true,
+      analyses = {
+        unusedparams = true,
       },
-      -- Make the server aware of Neovim runtime files
-      workspace = {
-        checkThirdParty = false,
-        library = {
-          vim.env.VIMRUNTIME
-          -- Depending on the usage, you might want to add additional paths here.
-          -- "${3rd}/luv/library"
-          -- "${3rd}/busted/library",
-        }
-        -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
-        -- library = vim.api.nvim_get_runtime_file("", true)
-      }
-    })
+    }
+  }
+})
+
+
+lspconfig.ts_ls.setup({
+  on_attach = function(client, bufnr)
+    -- 禁用 tsserver 的格式化功能，避免與其他格式化工具衝突
+    client.server_capabilities.documentFormattingProvider = false
   end,
   settings = {
-    Lua = {}
-  }
-}
+    javascript = {
+      suggest = {
+        autoImports = true,
+      },
+    },
+  },
+})
 
--- configuring single server, example: typescript
-lspconfig.ts_ls.setup {
-  on_attach = nvlsp.on_attach,
-  on_init = nvlsp.on_init,
-  capabilities = nvlsp.capabilities,
-}

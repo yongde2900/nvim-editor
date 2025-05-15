@@ -1,7 +1,8 @@
 require "nvchad.mappings"
 local vim = vim
 local dap = require("dap")
-local cmp = require("cmp")
+local dapui = require("dapui")
+local chat = require("CopilotChat")
 -- add yours here
 
 local map = vim.keymap.set
@@ -57,12 +58,15 @@ map("n", "<leader>doc", function()
   })
 end, { desc = 'Open documentation' })
 
+map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
+
 
 --git
 map("n", "<leader>gm", ":Telescope git_commits<CR>", { desc = "Git commits" })
 map("n", "<leader>gbm", ":Telescope git_bcommits<CR>", { desc = "Git buffer commits" })
 map("n", "<leader>gs", ":Telescope git_status<CR>", { desc = "Git status" })
 map("n", "<leader>gbc", ":Telescope git_branches<CR>", { desc = "Git branches" })
+map("n", "<leader>gsh ", ":Telescope git_stash<CR>", { desc = "Git stash" })
 
 --dap
 map("n", "<leader>bk", dap.toggle_breakpoint)
@@ -75,7 +79,8 @@ map("n", "<leader>2", dap.step_into)
 map("n", "<leader>3", dap.step_over)
 map("n", "<leader>4", dap.step_out)
 map("n", "<leader>5", dap.step_back)
-map("n", "<leader>0", dap.restart)
+map("n", "<leader>6", dap.restart)
+map("n", "<leader>0", dapui.toggle)
 
 -- Actions
 map("n", "<leader>rh", function()
@@ -129,3 +134,7 @@ end
 map("n", "t", function()
   hop.hint_lines_skip_whitespace()
 end)
+
+--copilot chat
+map("n", "<leader>cg", chat.toggle)
+map("v", "<leader>cg", chat.toggle)
