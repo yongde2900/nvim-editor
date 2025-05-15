@@ -6,13 +6,11 @@ return {
       "rcarriga/nvim-dap-ui",
       "theHamsta/nvim-dap-virtual-text",
       "nvim-neotest/nvim-nio",
-      "leoluz/nvim-dap-go",
     },
     config = function()
       local dap = require("dap")
       local ui = require("dapui")
 
-      require("dapui").setup()
       dap.adapters.delve = function(callback, config)
         if config.mode == 'remote' and config.request == 'attach' then
           callback({
@@ -23,10 +21,10 @@ return {
         else
           callback({
             type = 'server',
-            port = '${port}',
+            port = '38697',
             executable = {
               command = 'dlv',
-              args = { 'dap', '-l', '127.0.0.1:${port}', '--log', '--log-output=dap' },
+              args = { 'dap', '-l', '127.0.0.1:38697', '--log', '--log-output=dap', '--log-dest=/tmp/delve.log' },
               detached = vim.fn.has("win32") == 0,
             }
           })
@@ -35,24 +33,81 @@ return {
 
       dap.configurations.go = {
         {
-          name = "wt-ams",
           type = "delve",
+          name = "Debug-ams",
           request = "launch",
           mode = "debug",
           program = "${workspaceFolder}/cmd/wt-ams/main.go",
-          args = {},
-          envFile = "${workspaceFolder}/.env",
+          env = {
+            CC = "/usr/bin/cc",
+            CXX = "/usr/bin/c++",
+          }
+
         },
+        {
+          type = "delve",
+          name = "Debug-report",
+          request = "launch",
+          mode = "debug",
+          program = "${workspaceFolder}/cmd/wt-report/main.go",
+          CC = "/usr/bin/cc",
+          CXX = "/usr/bin/c++",
+
+        },
+        {
+          type = "delve",
+          name = "Debug-job",
+          request = "launch",
+          mode = "debug",
+          program = "${workspaceFolder}/cmd/wt-job/main.go",
+          CC = "/usr/bin/cc",
+          CXX = "/usr/bin/c++",
+
+        },
+        {
+          type = "delve",
+          name = "Debut-test",
+          request = "launch",
+          mode = "debug",
+          program = "${workspaceFolder}/cmd/wt-schedule/main.go",
+          CC = "/usr/bin/cc",
+          CXX = "/usr/bin/c++",
+
+        },
+        {
+          type = "delve",
+          name = "Debut-test",
+          request = "launch",
+          mode = "debug",
+          program = "${workspaceFolder}/cmd/my-test/main.go",
+          env = {
+            CC = "/usr/bin/cc",
+            CXX = "/usr/bin/c++",
+          }
+
+        },
+        {
+          type = "delve",
+          name = "Debug-path",
+          request = "launch",
+          mode = "debug",
+          program = function()
+            return vim.fn.input('Path to program: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+          CC = "/usr/bin/cc",
+          CXX = "/usr/bin/c++",
+        }
       }
 
+      require("dapui").setup()
       require("nvim-dap-virtual-text").setup {
         display_callback = function(variable)
           local name = string.lower(variable.name)
           local value = string.lower(variable.value)
 
-          if name:match "secret" or name:match "api" or value:match "secret" or value:match "api" then
-            return "*****"
-          end
+          -- if name:match "secret" or name:match "api" or value:match "secret" or value:match "api" then
+          --   return "*****"
+          -- end
 
           if #variable.value > 15 then
             return " " .. string.sub(variable.value, 1, 15) .. "... "

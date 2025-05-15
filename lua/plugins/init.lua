@@ -6,10 +6,20 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = { ensure_installed = { "html", "css", "bash", "lua" } },
+    opts = { ensure_installed = { "html", "css", "bash", "lua", "go", "groovy" } },
   },
-
-  -- These are some examples, uncomment them if you want to see them work!
+  {
+    "zbirenbaum/copilot.lua",
+    event = "InsertEnter",
+    opts = {
+      suggestion = {
+        auto_trigger = true,
+        keymap = {
+          accept = "<C-a>",
+        },
+      },
+    },
+  },
   {
     "neovim/nvim-lspconfig",
     config = function()
@@ -107,5 +117,49 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons"
     },
+  },
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    dependencies = {
+      { "zbirenbaum/copilot.lua" },
+      { "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
+    },
+    build = "make tiktoken",                          -- Only on MacOS or Linux
+    opts = {
+      prompts = {
+        ExpalinMer = {
+          prompt = "Write an explanation for the selected code as paragraphs of text. Use 正體中文",
+          mapping = '<leader>cex'
+        },
+        ReviewMer = {
+          prompt =
+          "You are a software developer responsible for conducting code reviews in the Engineering department of a technology/software company. After reviewing a code submission, generate a comprehensive report summarizing the findings. Include information such as identified issues, recommendations for improvement, areas of strength, and overall code quality assessment. The report should be well-structured, easy to understand, and provide actionable feedback to the developer. use mandarin",
+          mapping = '<leader>crv'
+        },
+        OptimizeMer = {
+          prompt = "Optimize the selected code to improve performance and readability with 正體中文",
+          mapping = '<leader>cop'
+        },
+        CommitMer = {
+          prompt =
+          "Write commit message for the change with commitizen convention，使用以下格式`[${feature name}][${type}]${commite message}`,其中type包括`Feat`, `Fix`, `Style`, `Docs`,`Refactor`, `Test`, `Chore`,並且feature name和commite message使用正體中文",
+          mapping = "<leader>ccm"
+        }
+      }
+    },
+  },
+  {
+    "ray-x/go.nvim",
+    dependencies = { -- optional packages
+      "ray-x/guihua.lua",
+      "neovim/nvim-lspconfig",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    config = function()
+      require("go").setup()
+    end,
+    event = { "CmdlineEnter" },
+    ft = { "go", 'gomod' },
+    build = ':lua require("go.install").update_all_sync()' -- if you need to install/update all binaries
   }
 }
