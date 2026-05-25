@@ -3,7 +3,7 @@ local options = {
     lua = { "stylua" },
     -- css = { "prettier" },
     -- html = { "prettier" },
-    go = { "gopls" }
+    go = { "gopls" },
   },
 
   format_on_save = {

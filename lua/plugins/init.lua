@@ -1,11 +1,13 @@
 return {
-  {
-    "stevearc/conform.nvim",
-    event = 'BufWritePre',
-    opts = require "configs.conform",
-  },
+  -- {
+  --   "stevearc/conform.nvim",
+  --   event = "BufWritePre",
+  --   opts = require "configs.conform",
+  -- },
   {
     "nvim-treesitter/nvim-treesitter",
+    lazy = false,
+    build = ":TSUpdate",
     opts = { ensure_installed = { "html", "css", "bash", "lua", "go", "groovy" } },
   },
   {
@@ -53,7 +55,7 @@ return {
               height = 0.5,
               border = "single",
             },
-            vertical = { location = "center", split_ratio = 0.5 },
+            vertical = { location = "rightbelow", split_ratio = .5 },
           },
         },
         behavior = {
@@ -100,13 +102,12 @@ return {
     end,
   },
   {
-    'smoka7/hop.nvim',
+    "smoka7/hop.nvim",
     version = "v2",
-    opts = {
-    }
+    opts = {},
   },
   {
-    'stevearc/aerial.nvim',
+    "stevearc/aerial.nvim",
     opts = {},
     lazy = false,
     config = function()
@@ -115,37 +116,7 @@ return {
     -- Optional dependencies
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
-      "nvim-tree/nvim-web-devicons"
-    },
-  },
-  {
-    "CopilotC-Nvim/CopilotChat.nvim",
-    dependencies = {
-      { "zbirenbaum/copilot.lua" },
-      { "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
-    },
-    build = "make tiktoken",                          -- Only on MacOS or Linux
-    opts = {
-      prompts = {
-        ExpalinMer = {
-          prompt = "Write an explanation for the selected code as paragraphs of text. Use 正體中文",
-          mapping = '<leader>cex'
-        },
-        ReviewMer = {
-          prompt =
-          "You are a software developer responsible for conducting code reviews in the Engineering department of a technology/software company. After reviewing a code submission, generate a comprehensive report summarizing the findings. Include information such as identified issues, recommendations for improvement, areas of strength, and overall code quality assessment. The report should be well-structured, easy to understand, and provide actionable feedback to the developer. use mandarin",
-          mapping = '<leader>crv'
-        },
-        OptimizeMer = {
-          prompt = "Optimize the selected code to improve performance and readability with 正體中文",
-          mapping = '<leader>cop'
-        },
-        CommitMer = {
-          prompt =
-          "Write commit message for the change with commitizen convention，使用以下格式`[${feature name}][${type}]${commite message}`,其中type包括`Feat`, `Fix`, `Style`, `Docs`,`Refactor`, `Test`, `Chore`,並且feature name和commite message使用正體中文",
-          mapping = "<leader>ccm"
-        }
-      }
+      "nvim-tree/nvim-web-devicons",
     },
   },
   {
@@ -165,9 +136,28 @@ return {
     -- setting the keybinding for LazyGit with 'keys' is recommended in
     -- order to load the plugin when the command is run for the first time
     keys = {
-      { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
-    }
-  }
+      { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
+    },
+  },
+  {},
+  {
+    "leoluz/nvim-dap-go",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+    },
+  },
+
+  -- {
+  --   "rest-nvim/rest.nvim",
+  --   dependencies = {
+  --     "nvim-treesitter/nvim-treesitter",
+  --     opts = function(_, opts)
+  --       opts.ensure_installed = opts.ensure_installed or {}
+  --       table.insert(opts.ensure_installed, "http")
+  --     end,
+  --   },
+  -- },
+
   -- {
   --   "ray-x/go.nvim",
   --   dependencies = { -- optional packages
