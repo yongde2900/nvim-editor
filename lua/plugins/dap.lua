@@ -33,17 +33,17 @@ return {
       end
 
       dap.configurations.go = {
-        {
-          type = "delve",
-          name = "Debug-ams",
-          request = "launch",
-          mode = "debug",
-          program = "${workspaceFolder}/cmd/wt-ams/main.go",
-          env = {
-            CC = "/usr/bin/cc",
-            CXX = "/usr/bin/c++",
-          },
-        },
+        -- {
+        --   type = "delve",
+        --   name = "Debug-ams",
+        --   request = "launch",
+        --   mode = "debug",
+        --   program = "${workspaceFolder}/cmd/wt-ams/main.go",
+        --   env = {
+        --     CC = "/usr/bin/cc",
+        --     CXX = "/usr/bin/c++",
+        --   },
+        -- },
         -- {
         --   type = "delve",
         --   name = "Debug-test",

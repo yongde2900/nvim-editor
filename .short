@@ -1,0 +1,45 @@
+
+alias glg="git lg"
+
+alias gco="git checkout"
+alias gcm="git commit -m"
+alias gwt="git worktree"
+alias tmcc="tmux && claude"
+
+
+
+cc() {
+  local safe_pwd="${PWD//[^[:alnum:]]/_}"
+  local session="${safe_pwd}-${1:-claude}"
+
+  if tmux has-session -t "$session" 2>/dev/null; then
+    tmux attach -t "$session"
+  else
+    tmux new-session -d -s "$session" -c "$PWD" "zsh -ic 'claude; exec zsh'" && \
+    tmux attach -t "$session"
+  fi
+}
+
+cd() {
+  setopt localoptions nopushdminus
+  builtin pushd "$@" > /dev/null && dirs -v
+}
+
+pp() {
+  setopt localoptions nopushdminus
+  if [ $# -eq 0 ]; then
+    builtin popd > /dev/null && dirs -v
+  else
+    builtin pushd "+$1" > /dev/null && dirs -v
+  fi
+}
+
+nmcp() {
+  local name="gitnexusMCP"
+  if tmux has-session -t "$name" 2>/dev/null; then
+    tmux kill-session -t "$name"
+  fi
+  tmux new-session -d -s "$name" -c "$PWD" "zsh -ic 'gitnexus mcp'" 
+  echo "gitnexus mcp start"
+
+}
