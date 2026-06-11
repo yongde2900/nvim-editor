@@ -8,7 +8,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = false,
     build = ":TSUpdate",
-    opts = { ensure_installed = { "html", "css", "bash", "lua", "go", "groovy" } },
+    opts = { ensure_installed = { "html", "css", "javascript", "typescript", "bash", "lua", "go", "groovy", "python" } },
   },
   {
     "zbirenbaum/copilot.lua",
@@ -55,7 +55,7 @@ return {
               height = 0.5,
               border = "single",
             },
-            vertical = { location = "rightbelow", split_ratio = .5 },
+            vertical = { location = "rightbelow", split_ratio = 0.5 },
           },
         },
         behavior = {
@@ -145,6 +145,10 @@ return {
     dependencies = {
       "mfussenegger/nvim-dap",
     },
+  },
+  {
+    "OXY2DEV/markview.nvim",
+    lazy = false,
   },
 
   -- {

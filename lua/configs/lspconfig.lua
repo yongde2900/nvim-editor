@@ -1,6 +1,18 @@
 -- vim.lsp.set_log_level("debug")
 --
 
+vim.lsp.enable "pyright"
+vim.lsp.config("pyright", {
+  settings = {
+    python = {
+      analysis = {
+        typeCheckingMode = "basic",
+        autoImportCompletions = true,
+      },
+    },
+  },
+})
+
 vim.lsp.enable "gopls"
 vim.lsp.config("gopls", {
   settings = {
@@ -99,16 +111,29 @@ vim.keymap.set("n", "K", function()
   vim.lsp.buf.hover { border = "rounded" }
 end)
 
--- lspconfig.ts_ls.setup({
---   on_attach = function(client, bufnr)
---     -- 禁用 tsserver 的格式化功能，避免與其他格式化工具衝突
---     client.server_capabilities.documentFormattingProvider = false
---   end,
---   settings = {
---     javascript = {
---       suggest = {
---         autoImports = true,
---       },
---     },
---   },
--- })
+vim.lsp.enable "ts_ls"
+vim.lsp.config("ts_ls", {
+  settings = {
+    typescript = {
+      suggest = { autoImports = true },
+      inlayHints = {
+        includeInlayParameterNameHints = "all",
+        includeInlayReturnTypeHints = true,
+      },
+    },
+    javascript = {
+      suggest = { autoImports = true },
+    },
+  },
+})
+
+vim.lsp.enable "html"
+
+vim.lsp.enable "cssls"
+vim.lsp.config("cssls", {
+  settings = {
+    css = { validate = true },
+    scss = { validate = true },
+    less = { validate = true },
+  },
+})
