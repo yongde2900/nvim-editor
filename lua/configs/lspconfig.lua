@@ -58,6 +58,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
+vim.lsp.enable "lua_ls"
 vim.lsp.config("lua_ls", {
   on_init = function(client)
     if client.workspace_folders then
