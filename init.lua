@@ -99,3 +99,14 @@ opt.splitright = true -- split vertical window to the right
 opt.splitbelow = true -- split horizontal window to the bottom
 
 opt.iskeyword:append "-" -- consider string-string as whole word
+
+
+-- set terminal tab name
+opt.title = true
+local prefix = vim.env.SSH_TTY and "SSH " or ""
+
+vim.api.nvim_create_autocmd({'DirChanged',"BufEnter"},{
+  callback = function ()
+    vim.opt.titlestring = prefix .. vim.fn.fnamemodify(vim.fn.getcwd(),":t")
+  end
+})

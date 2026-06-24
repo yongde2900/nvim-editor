@@ -10,6 +10,7 @@
     ]
   },
   "diagnostics": {
-    "globals": ["vim"]
+    "globals": ["vim",
+            "get_select"]
   }
 }
