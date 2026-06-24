@@ -1,10 +1,9 @@
-
 alias glg="git lg"
 
 alias gco="git checkout"
 alias gcm="git commit -m"
-alias gwt="git worktree"
-alias tmcc="tmux && claude"
+alias gott="gotestsum"
+alias lg="lazygit"
 
 
 
@@ -15,23 +14,16 @@ cc() {
   if tmux has-session -t "$session" 2>/dev/null; then
     tmux attach -t "$session"
   else
-    tmux new-session -d -s "$session" -c "$PWD" "zsh -ic 'claude; exec zsh'" && \
+    newTmux "$session" "$PWD" "zsh -ic 'claude; exec zsh'" && \
     tmux attach -t "$session"
   fi
 }
 
-cd() {
-  setopt localoptions nopushdminus
-  builtin pushd "$@" > /dev/null && dirs -v
-}
-
-pp() {
-  setopt localoptions nopushdminus
-  if [ $# -eq 0 ]; then
-    builtin popd > /dev/null && dirs -v
-  else
-    builtin pushd "+$1" > /dev/null && dirs -v
-  fi
+newTmux() {
+  local session="$1"
+  local dir="${2:-$PWD}"
+  shift 2
+  tmux new-session -d -s "$session" -c "$dir" -P -F '#{pane_id}' "$@"
 }
 
 nmcp() {
