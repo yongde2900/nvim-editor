@@ -42,7 +42,7 @@ local function term_nav(dir)
   local keys = vim.api.nvim_replace_termcodes("<C-\\><C-n><C-w>" .. dir, true, false, true)
   vim.api.nvim_feedkeys(keys, "n", false)
 end
-map("t", "<C-b>", function()
+map("t", "<C-v>", function()
   term_nav "h"
 end, { desc = "Terminal: move left" })
 map("t", "<C-w>j", function()
