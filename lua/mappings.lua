@@ -151,7 +151,11 @@ map("n", "<leader>fjs", ":%!jq .<CR>")
 
 -- Send visual selection to Claude Code tmux session
 local claude = require "configs.claude"
-map("v", "<leader>ac", claude.send_selection, { desc = "Send selection to Claude Code" })
+map("v", "<leader>cs", claude.send_selection, { desc = "Send selection to Claude Code" })
+map("v", "<leader>cr", claude.review, { desc = "review selection to Claude Code" })
+map("v", "<leader>co", claude.optimize, { desc = "optimize selection to Claude Code" })
+map("v", "<leader>ce", claude.explain, { desc = "explain selection to Claude Code" })
+map("v", "<leader>ct", claude.test, { desc = "test selection to Claude Code" })
 
 -- place this in one of your configuration file(s)
 local hop = require "hop"
