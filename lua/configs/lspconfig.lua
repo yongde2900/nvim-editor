@@ -128,6 +128,19 @@ vim.lsp.config("ts_ls", {
   },
 })
 
+vim.lsp.enable "jdtls"
+vim.lsp.config("jdtls", {
+  settings = {
+    java = {
+      signatureHelp = { enabled = true },
+      contentProvider = { preferred = "fernflower" },
+      completion = {
+        importOrder = { "java", "javax", "com", "org" },
+      },
+    },
+  },
+})
+
 vim.lsp.enable "html"
 
 vim.lsp.enable "cssls"
