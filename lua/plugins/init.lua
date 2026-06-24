@@ -8,7 +8,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = false,
     build = ":TSUpdate",
-    opts = { ensure_installed = { "html", "css", "javascript", "typescript", "bash", "lua", "go", "groovy", "python" } },
+    opts = { ensure_installed = { "html", "css", "javascript", "typescript", "bash", "lua", "go", "groovy", "python", "java" } },
   },
   {
     "zbirenbaum/copilot.lua",
