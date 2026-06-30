@@ -139,7 +139,53 @@ return {
       { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
     },
   },
-  {},
+  {
+    "coder/claudecode.nvim",
+    -- Load shortly after the UI is up so we can auto-start the server.
+    event = "VeryLazy",
+    opts = {
+      -- Never open an embedded terminal in Neovim; always talk to the
+      -- external `claude` connected via :ClaudeCodeStart + /ide over WebSocket.
+      terminal = { provider = "none" },
+    },
+    config = function(_, opts)
+      require("claudecode").setup(opts)
+      -- Auto-start the WebSocket server, but skip if another nvim already
+      -- runs one for this same workspace (each lock file is named by port and
+      -- records its workspaceFolders). Avoids multiple servers advertising the
+      -- same project, which makes `/ide` ambiguous about which nvim to attach.
+      local cwd = vim.fn.getcwd()
+      local ide_dir = vim.fn.expand "~/.claude/ide"
+      local already = false
+      for _, f in ipairs(vim.fn.glob(ide_dir .. "/*.lock", true, true)) do
+        local ok, data = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(f), "\n"))
+        if ok and data.workspaceFolders and vim.tbl_contains(data.workspaceFolders, cwd) then
+          already = true
+          break
+        end
+      end
+      if not already then
+        vim.cmd "ClaudeCodeStart"
+      end
+    end,
+    keys = {
+      { "<leader>oa", nil, desc = "AI/Claude Code" },
+      { "<leader>ac", "<cmd>ClaudeCodeStart<cr>", desc = "Start Claude server" },
+      { "<leader>aq", "<cmd>ClaudeCodeStop<cr>", desc = "Stop Claude server" },
+      { "<leader>aS", "<cmd>ClaudeCodeStatus<cr>", desc = "Claude server status" },
+      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
+      { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+      {
+        "<leader>as",
+        "<cmd>ClaudeCodeTreeAdd<cr>",
+        desc = "Add file",
+        ft = { "NvimTree", "neo-tree", "oil", "minifiles" },
+      },
+      -- Diff management
+      { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+      { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+    },
+  },
   {
     "leoluz/nvim-dap-go",
     dependencies = {
