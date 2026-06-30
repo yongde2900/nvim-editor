@@ -174,3 +174,5 @@ end)
 map("n", "t", function()
   hop.hint_lines_skip_whitespace()
 end)
+
+map("n", "<leader>hh", ":HopWord<CR>", { desc = "Hop Word" })
