@@ -4,7 +4,9 @@ alias gco="git checkout"
 alias gcm="git commit -m"
 alias gott="gotestsum"
 alias lg="lazygit"
-
+alias ghcp="gh pr create --web"
+alias ghrp="gh repo view --web"
+ 
 
 
 cc() {
