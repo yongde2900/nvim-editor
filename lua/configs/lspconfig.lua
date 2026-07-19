@@ -128,17 +128,25 @@ vim.lsp.config("ts_ls", {
   },
 })
 
-vim.lsp.enable "jdtls"
-vim.lsp.config("jdtls", {
-  settings = {
-    java = {
-      signatureHelp = { enabled = true },
-      contentProvider = { preferred = "fernflower" },
-      completion = {
-        importOrder = { "java", "javax", "com", "org" },
-      },
-    },
-  },
+-- vim.lsp.enable ("jdtls")
+
+-- vim.lsp.enable "jdtls"
+-- vim.lsp.config("jdtls", {
+--   settings = {
+--     java = {
+--       signatureHelp = { enabled = true },
+--       contentProvider = { preferred = "fernflower" },
+--       completion = {
+--         importOrder = { "java", "javax", "com", "org" },
+--       },
+--     },
+--   },
+-- })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "java",
+  callback = function(args)
+    require "jdtls.jdtls_setup".setup()
+  end
 })
 
 vim.lsp.enable "html"

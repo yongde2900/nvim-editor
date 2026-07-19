@@ -6,21 +6,12 @@ return {
   -- },
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "main",
     lazy = false,
     build = ":TSUpdate",
-    opts = { ensure_installed = { "html", "css", "javascript", "typescript", "bash", "lua", "go", "groovy", "python", "java" } },
-  },
-  {
-    "zbirenbaum/copilot.lua",
-    event = "InsertEnter",
-    opts = {
-      suggestion = {
-        auto_trigger = true,
-        keymap = {
-          accept = "<C-a>",
-        },
-      },
-    },
+    config = function()
+      require("nvim-treesitter").install({ "html", "css", "javascript", "typescript", "bash", "lua", "go", "groovy", "python", "java" })
+    end,
   },
   {
     "neovim/nvim-lspconfig",
@@ -196,6 +187,9 @@ return {
     "OXY2DEV/markview.nvim",
     lazy = false,
   },
+  {
+    "mfussenegger/nvim-jdtls"
+  }
 
   -- {
   --   "rest-nvim/rest.nvim",
