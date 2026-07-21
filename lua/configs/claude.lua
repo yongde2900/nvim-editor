@@ -33,9 +33,7 @@ Explain the selected code to a senior engineer unfamiliar with this module:
   test = [[
 Write comprehensive tests for the selected code. Include:
 1. Happy path — normal expected usage
-2. Edge cases — empty input, null/nil, boundary values, max/min
-3. Error cases — invalid input, failure modes, exception paths
-4. Any concurrency or state-related scenarios if applicable
+2. Any concurrency or state-related scenarios if applicable
 
 Use the same language and test framework already present in the project. Add a brief comment on what each test validates.]],
 }
@@ -75,7 +73,7 @@ end
 function M.focus()
   local surface = resolve_surface()
   if surface then
-    rpc("surface.focus", { surface_id = surface })
+    local res =rpc("surface.focus", { surface_id = surface })
   end
 end
 
@@ -129,6 +127,10 @@ end
 -- inherited and the new surface lands in the current workspace. We capture the
 -- surface UUID so later sends can target this exact tab.
 function M.open_window()
+  if M.claude_surface then
+    M.focus()
+    return
+  end
   local cwd = vim.fn.getcwd()
   local out = cmux {
     "--id-format", "both",
