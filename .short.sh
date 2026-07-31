@@ -27,13 +27,3 @@ newTmux() {
   shift 2
   tmux new-session -d -s "$session" -c "$dir" -P -F '#{pane_id}' "$@"
 }
-
-nmcp() {
-  local name="gitnexusMCP"
-  if tmux has-session -t "$name" 2>/dev/null; then
-    tmux kill-session -t "$name"
-  fi
-  tmux new-session -d -s "$name" -c "$PWD" "zsh -ic 'gitnexus mcp'" 
-  echo "gitnexus mcp start"
-
-}
