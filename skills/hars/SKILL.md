@@ -1,10 +1,12 @@
 # Hars — Harness-Driven Development
 
 **Role split (critical):**
-- **You = Coordinator** — retrieve relevant prior knowledge, clarify requirements with the user, fix the project toolchain, author the BDD spec, orchestrate agents, manage plan state, communicate with user
-- **Planner (opus 4.8)** — map the approved BDD scenarios into dependency-ordered sub-tasks with interface contracts, and write the plan file
-- **Executor (sonnet)** — implement each sub-task: Red → Green → Refactor → Regulate
-- **Evaluator (sonnet)** — fresh context, reads the code from disk, reviews quality, and confirms the executed tests genuinely cover each BDD scenario
+- **You = Coordinator** — retrieve relevant prior knowledge, clarify requirements with the user, fix the project toolchain, author the BDD spec, orchestrate agents, manage plan state, communicate with user. This file is your playbook.
+- **Planner (opus 4.8)** — map the approved BDD scenarios into dependency-ordered sub-tasks with interface contracts, and write the plan file. Prompt template: [roles/planner.md](roles/planner.md)
+- **Executor (sonnet)** — implement each sub-task: Red → Green → Refactor → Regulate. Prompt template: [roles/executor.md](roles/executor.md)
+- **Evaluator (sonnet)** — fresh context, reads the code from disk, reviews quality, and confirms the executed tests genuinely cover each BDD scenario. Prompt template: [roles/evaluator.md](roles/evaluator.md)
+
+> Each subagent role's spawn prompt lives in its own doc under `roles/`. When a phase below says "spawn the Planner/Executor/Evaluator", open that role's doc and paste its template (filling the `<...>` placeholders). Only the Coordinator's own workflow — clarification, BDD authoring, the two approval gates, orchestration, and integration — stays inline here.
 
 ## Trigger
 
@@ -138,103 +140,7 @@ Reply "通過" / "go" / "ok" to lock the spec and start planning, or tell me wha
 
 Spawn an `Agent` with `model: "opus"`. The Planner reads the approved BDD file, groups scenarios into sub-tasks, orders them by dependency, declares each task's interface contract, and writes the plan file. **Every scenario must land in exactly one sub-task** — no scenario dropped, none duplicated.
 
-Planner prompt template:
-```
-You are a senior software architect. Map an approved BDD spec into dependency-ordered sub-tasks and write a plan file.
-
-## BDD Spec (source of truth)
-<paste the full contents of BDD-NNN-<slug>.feature>
-
-## Known Context (from the knowledge base — reuse, don't contradict)
-<paste the Phase 0 Known Context digest: prior decisions + why, existing architecture/interfaces, conventions, gotchas. Write "none" if there is no knowledge base.>
-
-## Toolchain
-Language: <stack>   Build: <build cmd>   Test: <test cmd>   Lint: <lint cmd>
-
-## Working Directory
-<abs path>
-
-## Plan File Path
-<working_dir>/plan/PLAN-NNN-<slug>.md
-
-## Instructions
-
-1. Group the BDD scenarios into sub-tasks. Each sub-task must have:
-   - A clear, narrow scope (ideally one file or one feature boundary)
-   - Expected Goals = the exact BDD scenarios it must satisfy, referenced by scenario name.
-     Every scenario in the spec must be covered by exactly one sub-task.
-   - **Depends on** — which earlier tasks' interfaces it uses (a real decomposition is rarely fully independent; be honest about coupling).
-   - **Provides (public interface)** — the exported types / function signatures it exposes for dependents.
-   Reuse the architecture and interfaces named in **Known Context** instead of inventing parallel ones; if a task must contradict a recorded decision, flag it explicitly in the Overview.
-   Order the tasks topologically: every task appears AFTER the tasks it depends on.
-   Also mark **Integration Scenarios**: any scenario that only truly holds once several tasks are assembled (typically the end-to-end happy path). It still belongs to exactly one task in Coverage Check, but ALSO list it under `## Integration Scenarios` for whole-system re-verification in Phase 6.
-
-2. Write the plan file at the given path using this structure:
-
----
-# PLAN-NNN — <brief>
-Created: <YYYY-MM-DD>
-Status: in-progress
-Working Directory: <abs path>
-BDD Spec: <working_dir>/bdd/BDD-NNN-<slug>.feature
-Language: <stack>
-Build cmd: <e.g. go build ./...>
-Test cmd:  <e.g. go test -race ./<dir>/...>
-Lint cmd:  <e.g. go vet ./<dir>/...>
-
-## Known Context
-<!-- knowledge-base entries this plan builds on; "none" if there is no knowledge base -->
-- [[slug]] — <what it constrains or informs here>
-
-## Overview
-<one paragraph describing what will be built overall>
-
-## Sub-Tasks
-<!-- listed in dependency order: a task never precedes something it depends on -->
-
-### Task 1: <name>
-Status: pending
-Directory: <relative path>
-Depends on: <none | earlier Task numbers whose interfaces this task uses>
-Provides (public interface): <exported types / function signatures other tasks may rely on>
-Expected Goals (from BDD scenarios):
-- [ ] Scenario: <scenario name>
-- [ ] Scenario: <scenario name>
-
-### Task 2: <name>
-Status: pending
-Directory: <relative path>
-Depends on: <none | earlier Task numbers>
-Provides (public interface): <...>
-Expected Goals (from BDD scenarios):
-- [ ] Scenario: <scenario name>
-
-<!-- add more tasks as needed -->
-
-## Coverage Check
-<!-- REQUIRED: one row per BDD scenario, in spec order. Each scenario maps to exactly ONE task. -->
-- Scenario: <scenario name> → Task N
-- Scenario: <scenario name> → Task N
-
-## Integration Scenarios
-<!-- Scenarios that only hold once multiple tasks are assembled (end-to-end / spanning layers).
-     Each is still counted exactly once in Coverage Check above; re-verified as a whole in Phase 6. -->
-- Scenario: <name>
-
-## Iteration Log
-<!-- updated after each Evaluate cycle -->
----
-
-3. Self-check coverage before returning — this is REQUIRED, not optional:
-   - List every `Scenario:` name from the BDD spec above, in order.
-   - Map each to the single sub-task that covers it, and fill in the `## Coverage Check` section.
-   - Then audit that filled section: the number of Coverage Check rows MUST equal the number of scenarios in the spec, every scenario name appears exactly once, and no scenario is missing.
-   - A scenario that appears in two tasks (duplicate) or in zero tasks (dropped) is a FAILURE — regroup the sub-tasks and redo the check until coverage is exactly-once.
-   - Also confirm the task order is a valid topological order (no task depends on a later one).
-   Do not return until both checks pass.
-
-4. Return the plan file path and a numbered list of sub-tasks (in dependency order) showing each task's Depends-on and which scenarios it covers, plus one line confirming: "Coverage: N scenarios, each mapped to exactly one task."
-```
+📄 **Planner prompt template → [roles/planner.md](roles/planner.md).** Open it, fill the `<...>` placeholders (BDD spec, Known Context digest, toolchain, working dir, plan file path), and paste it as the Planner agent's prompt.
 
 ### 2c — User Confirmation (MANDATORY)
 
@@ -267,52 +173,9 @@ If the user requests changes, update the plan file (or re-spawn the Planner) and
 
 For each sub-task **in the plan's dependency order**:
 1. Mark `Status: in-progress` in the plan file.
-2. Spawn an `Agent` with `model: "sonnet"` using the Executor prompt below.
+2. Spawn an `Agent` with `model: "sonnet"` using the Executor prompt template.
 
-Executor prompt template:
-```
-You are a senior software engineer implementing a specific sub-task using TDD.
-
-## Sub-Task: <Task N name>
-Directory: <relative path>
-
-## BDD Scenarios this task must satisfy
-<paste the Given/When/Then blocks for this task's scenarios from BDD-NNN-<slug>.feature>
-
-## Available Interfaces (from completed dependencies)
-<paste the `Provides (public interface)` of each task this one Depends on, so you build against real signatures, not guesses. Write "none" if this task has no dependencies.>
-
-## Working Directory
-<abs path>
-
-## Toolchain
-Test: <test cmd>   Lint: <lint cmd>
-
-## Project Conventions & Known Gotchas (from Phase 0 knowledge base / the codebase — not hard-coded)
-<paste this project's conventions (error-handling style, state model, cancellation, etc.) plus any relevant gotchas from the Known Context digest.>
-
-## Instructions
-
-### For code tasks — follow Red → Green → Refactor → Regulate:
-
-**Red:** Write all tests first, one per BDD scenario above (Given=setup, When=action, Then=assertion).
-Tests must reference types and functions that do not exist yet.
-Run the Test cmd scoped to this task's directory.
-Tests MUST fail here (compilation error is fine). If they pass, rewrite them to exercise missing code.
-
-**Green:** Write the minimum implementation to make all tests pass.
-Run the Test cmd again. All tests must pass before continuing.
-
-**Refactor:** Clean up naming, eliminate duplication, harden edge cases. Run tests again — must still pass.
-
-**Regulate:** Final gate — run the Lint cmd and the Test cmd for this task's directory.
-Both must pass. If not, return to Green.
-
-### For non-code artifacts (SQL migrations, YAML fixtures, proto definitions, config):
-Implement the artifact directly. No test phases.
-
-Return: a summary of what was implemented and the **list of file paths** created or modified — NOT their full contents (the Coordinator and Evaluator read them from disk).
-```
+📄 **Executor prompt template → [roles/executor.md](roles/executor.md).** Open it, fill the `<...>` placeholders (this task's scenarios, the dependencies' `Provides` interfaces, working dir, toolchain, project conventions), and paste it as the Executor agent's prompt.
 
 After the Executor returns, verify from disk by running the project's **Lint cmd** and **Test cmd** for this task's directory (from the plan header). Keep the raw test output — the Evaluator needs it.
 If this fails, re-spawn the Executor with the failure output as additional context.
@@ -338,41 +201,7 @@ If this fails, re-spawn the Executor with the failure output as additional conte
 >
 > A violation means the results are untrusted — re-evaluate from the violated task.
 
-
-Evaluator prompt template:
-```
-You are a rigorous code reviewer. You have no context about how this code was written.
-
-## Sub-Task: <Task N name>
-Directory: <relative path>
-
-## BDD Scenarios (grading standard)
-<paste the Given/When/Then blocks for this task's scenarios from BDD-NNN-<slug>.feature>
-
-## Test Results (already executed in Phase 3 — the source of truth for functionality)
-<paste the raw output of the project's Test cmd for this task>
-
-## Instructions
-Read the task's source and test files yourself from the Directory above — do not expect them pasted.
-
-Grade four criteria 0–10:
-- functionality (50%, HARD GATE): Do the executed tests above pass, AND do the tests genuinely exercise each BDD scenario's Given/When/Then (not trivially or tautologically)? Mark each scenario met/unmet. A scenario is `unmet` if no test truly checks it — even when the suite is green.
-- craft         (25%): Error handling, edge cases, correctness under the scenarios' conditions.
-- clarity       (15%): Naming, structure, readability.
-- fit           (10%): Builds on the dependencies' real interfaces; no needless divergence from project conventions.
-
-Compute the weighted average. Do NOT reject correct, all-scenarios-met code for being "plain" or "boilerplate" — plain code that meets every scenario is good. Style concerns are `warning`s, not blockers, unless they break a scenario.
-
-SCORE: <0-10>
-PASSED: <true only if EVERY scenario is met AND weighted score ≥ 7.0>
-SUMMARY: <one sentence>
-SCENARIOS:
-- [met|unmet] <scenario name>: <which test covers it, or why it's unmet>
-ISSUES:
-- [error|warning|info] <criterion>: <specific finding>
-DETAILS:
-<per-criterion breakdown>
-```
+📄 **Evaluator prompt template → [roles/evaluator.md](roles/evaluator.md).** Open it, fill the `<...>` placeholders (this task's scenarios as the grading standard, and the raw Test cmd output from Phase 3), and paste it as the Evaluator agent's prompt.
 
 ---
 
