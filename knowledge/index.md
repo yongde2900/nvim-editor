@@ -11,6 +11,8 @@ created, refresh the hook when content changes.
 - [Evaluator: functionality is a 50% hard gate](decisions/hars-evaluator-functionality-hard-gate.md) — dropped "originality"; functionality grounded in executed test results, not source-reading
 - [Whole-system integration gate (Phase 6)](decisions/hars-integration-gate.md) — per-task passes aren't "done"; re-verify cross-cutting scenarios on the assembled system
 - [Knowledge-base retrieval + save-back loop](decisions/hars-knowledge-base-retrieval.md) — Phase 0 retrieves ./knowledge/, threads Known Context, Phase 6 saves back
+- [The PLAN file is a shared state machine](decisions/hars-plan-file-is-the-shared-state-machine.md) — one normative schema (plan-format.md); no `failed` status; stalling writes the plan header; thresholds live in the header, not in prompts
+- [hars is split by write authority](decisions/hars-split-by-write-authority.md) — six skills divided by what each may write; only hars-plan writes `approved`, only hars-verify writes `done`; hars-status/hars-grade write nothing
 
 ## Conventions
 - [Validating skill changes with subagents](conventions/validating-skill-changes-with-subagents.md) — control/treatment fresh-context tests, 5 reps, verify on disk not self-reports

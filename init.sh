@@ -151,4 +151,30 @@ info "設定 shell alias"
 ln -sf ~/.config/nvim/.short.sh ~/.short.sh
 grep -qxF 'source ~/.short.sh' ~/.zshrc || echo 'source ~/.short.sh' >> ~/.zshrc
 
+# ---------------------------------------------------------------------------
+# 8. Claude Code skills (symlink 到全域資料夾)
+# ---------------------------------------------------------------------------
+info "設定 Claude Code skills"
+mkdir -p ~/.claude/skills
+
+# 先清掉指向本 repo、但目標已不是 skill 的 symlink (skill 改名或刪除後留下的)
+for link in ~/.claude/skills/*; do
+  [ -L "$link" ] || continue
+  case "$(readlink "$link")" in
+    "$HOME/.config/nvim/skills/"*) ;;
+    *) continue ;;
+  esac
+  [ -f "$link/SKILL.md" ] && continue
+  rm "$link"
+  warn "移除失效 skill symlink $(basename "$link")"
+done
+
+# 只有含 SKILL.md 的目錄才是 skill (README.md、雜物目錄會被略過)
+for skill_dir in ~/.config/nvim/skills/*/; do
+  [ -f "$skill_dir/SKILL.md" ] || continue
+  skill_name=$(basename "$skill_dir")
+  ln -sfn "$skill_dir" ~/.claude/skills/"$skill_name"
+  info "  symlink skill $skill_name"
+done
+
 info "完成！開啟 nvim 讓 lazy.nvim 自動安裝 plugin，並執行 :TSUpdate。"
