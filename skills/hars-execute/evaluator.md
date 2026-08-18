@@ -39,7 +39,7 @@ Grade four criteria 0–10:
 
 Compute the weighted average. Do NOT reject correct, all-scenarios-met code for being "plain" or "boilerplate" — plain code that meets every scenario is good. Style concerns are `warning`s, not blockers, unless they break a scenario.
 
-Judge only this task's scope. Missing functionality that belongs to another sub-task is not a defect here.
+Judge only this task's scope. Missing functionality that belongs to another sub-task is not a defect here. More generally: **absence is a defect only when a scenario above requires the thing.** The scenarios are the whole specification — capability the plan deliberately excluded looks identical, from where you sit, to capability someone forgot, so do not mark down code for not doing what you were never asked to check.
 
 SCORE: <0-10>
 PASSED: <true only if EVERY scenario is met AND the weighted score ≥ the Pass Threshold above>

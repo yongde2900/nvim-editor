@@ -23,7 +23,7 @@ rather than restating it; if you change the format, change it here and check all
 # PLAN-NNN — <brief>
 Created: <YYYY-MM-DD>
 Status: draft
-Working Directory: <abs path>
+Working Directory: <relative path>
 BDD Spec: <working_dir>/bdd/BDD-NNN-<slug>.feature
 Language: <stack>
 Build cmd: <e.g. go build ./...>
@@ -38,6 +38,13 @@ Superseded by: <optional — PLAN-MMM, written by hars-revise when forking>
      place, gotchas to avoid. Cite [[slug]] alongside the prose for traceability, never instead
      of it. Write "none" if there is no knowledge base. -->
 - <decision / constraint stated in full> — why: <reason> — source: [[slug]]
+
+### Out of Scope & Ungraded Constraints
+<!-- What was deliberately NOT built this round, plus any acceptance criterion that did not
+     become a BDD scenario (and is therefore checked by a human, never by the harness).
+     Required section: write "none" rather than omitting it. Full sentences — an Executor
+     reads a missing capability as an oversight unless this says otherwise. -->
+- <not built / not graded, stated in full> — why: <reason>
 
 ## Project Conventions
 <!-- Error-handling style, state and cancellation model, naming, layout. Copied here verbatim
