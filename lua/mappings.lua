@@ -149,7 +149,7 @@ end)
 
 map("n", "<leader>fjs", ":%!jq .<CR>")
 
--- Send visual selection to Claude Code tmux session
+-- Send visual selection to the Claude Code agent in this Herdr workspace
 local claude = require "configs.claude"
 map("v", "<leader>cs", claude.send_selection, { desc = "Send selection to Claude Code" })
 map("v", "<leader>cr", claude.review, { desc = "review selection to Claude Code" })
@@ -157,8 +157,9 @@ map("v", "<leader>co", claude.optimize, { desc = "optimize selection to Claude C
 map("v", "<leader>ce", claude.explain, { desc = "explain selection to Claude Code" })
 map("v", "<leader>ct", claude.test, { desc = "test selection to Claude Code" })
 
--- Open Claude Code in a standalone Ghostty window (closes when claude exits)
-map("n", "<leader>cc", claude.open_window, { desc = "Open Claude Code in new Ghostty window" })
+-- Open Claude Code in a new tab of the current Herdr workspace (or focus it)
+map("n", "<leader>cc", claude.open_window, { desc = "Open Claude Code in a Herdr tab" })
+map("n", "<leader>cS", claude.status, { desc = "Claude Code agent status" })
 -- vim.api.nvim_create_user_command("Claude", claude.open_window, { desc = "Open Claude Code in a new Ghostty window" })
 
 -- place this in one of your configuration file(s)
