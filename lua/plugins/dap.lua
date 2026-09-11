@@ -60,6 +60,18 @@ return {
         --   end
         -- },
         {
+          -- 等同於 GO_TEST_CONTAINER=1 go test -v ./test
+          type = "delve",
+          name = "Debug-test-container",
+          request = "launch",
+          mode = "test",
+          program = function()
+            return vim.fn.input("Test package: ", vim.fn.getcwd() .. "/test", "dir")
+          end,
+          args = { "-test.v" },
+          env = { GO_TEST_CONTAINER = "1" },
+        },
+        {
           type = "delve",
           name = "Debug-path",
           request = "launch",
