@@ -1,0 +1,4 @@
+# Iosevka Term: 為終端機設計的窄版 (推薦)
+# 其他兩個家族: "Iosevka" (預設寬度) / "Iosevka Fixed" (無連字)
+font-family = "Iosevka Term"
+font-size = 14

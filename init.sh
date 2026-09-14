@@ -121,9 +121,11 @@ npm_install \
 npm_install @anthropic-ai/claude-code
 
 # ---------------------------------------------------------------------------
-# 5. 字型 (NvChad 需要 Nerd Font)
+# 5. 字型 (NvChad 需要 Nerd Font；Iosevka 為 ghostty 終端機字型)
 # ---------------------------------------------------------------------------
-cask_install font-jetbrains-mono-nerd-font
+cask_install \
+  font-jetbrains-mono-nerd-font \
+  font-iosevka
 
 # ---------------------------------------------------------------------------
 # 6. GUI 應用程式
@@ -152,7 +154,20 @@ ln -sf ~/.config/nvim/.short.sh ~/.short.sh
 grep -qxF 'source ~/.short.sh' ~/.zshrc || echo 'source ~/.short.sh' >> ~/.zshrc
 
 # ---------------------------------------------------------------------------
-# 8. Claude Code skills (symlink 到全域資料夾)
+# 8. Ghostty 終端機設定 (symlink 到 ~/.config/ghostty/config)
+# ---------------------------------------------------------------------------
+info "設定 Ghostty"
+mkdir -p ~/.config/ghostty
+
+# 既有的實體設定檔先備份，避免直接被 symlink 蓋掉 (已是 symlink 就直接覆寫)
+if [ -f ~/.config/ghostty/config ] && [ ! -L ~/.config/ghostty/config ]; then
+  mv ~/.config/ghostty/config ~/.config/ghostty/config.bak
+  warn "原有 ghostty config 已備份為 config.bak"
+fi
+ln -sfn ~/.config/nvim/ghostty/config ~/.config/ghostty/config
+
+# ---------------------------------------------------------------------------
+# 9. Claude Code skills (symlink 到全域資料夾)
 # ---------------------------------------------------------------------------
 info "設定 Claude Code skills"
 mkdir -p ~/.claude/skills
