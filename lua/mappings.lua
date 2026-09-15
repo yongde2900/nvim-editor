@@ -107,9 +107,9 @@ map("n", "<leader>4", dap.step_out)
 map("n", "<leader>5", dap.step_back)
 map("n", "<leader>6", dap.restart)
 map("n", "<leader>0", dapui.toggle)
--- 等同於 GO_TEST_CONTAINER=1 go test -v -run '^TestXxx$' ./<目前 package>
+-- GO_TEST_CONTAINER 公司專案用
 map("n", "<leader>dt", function()
-  dapgo.debug_test { env = { GO_TEST_CONTAINER = "1" } }
+  dapgo.debug_test { env = { GO_TEST_CONTAINER = "" } }
 end)
 -- debug_last_test 不吃 custom_config，用 dap.run_last 才會連 env 一起重跑
 map("n", "<leader>dtl", dap.run_last)
