@@ -41,7 +41,8 @@ local function decode(proc)
   local payload = (proc.stdout ~= nil and proc.stdout ~= "") and proc.stdout or (proc.stderr or "")
   local ok, body = pcall(vim.json.decode, payload)
   if not ok or type(body) ~= "table" then
-    return nil, { code = "cli_error", message = vim.trim(payload) ~= "" and vim.trim(payload) or ("exit " .. proc.code) }
+    return nil,
+      { code = "cli_error", message = vim.trim(payload) ~= "" and vim.trim(payload) or ("exit " .. proc.code) }
   end
   if proc.code ~= 0 or body.error then
     return nil, body.error or { code = "cli_error", message = "exit " .. proc.code }
@@ -204,10 +205,14 @@ function M.open_window()
 
   local cwd = vim.fn.getcwd()
   local res, err = herdr {
-    "tab", "create",
-    "--workspace", workspace(),
-    "--cwd", cwd,
-    "--label", vim.fn.fnamemodify(cwd, ":t"),
+    "tab",
+    "create",
+    "--workspace",
+    workspace(),
+    "--cwd",
+    cwd,
+    "--label",
+    vim.fn.fnamemodify(cwd, ":t"),
     M.config.focus_on_open and "--focus" or "--no-focus",
   }
   if not res then
@@ -232,10 +237,15 @@ function M.open_window()
       return
     end
     herdr_async({
-      "agent", "start", name,
-      "--kind", M.config.kind,
-      "--pane", pane,
-      "--timeout", tostring(M.config.start_timeout_ms),
+      "agent",
+      "start",
+      name,
+      "--kind",
+      M.config.kind,
+      "--pane",
+      pane,
+      "--timeout",
+      tostring(M.config.start_timeout_ms),
     }, function(started, start_err)
       if started and started.agent then
         bind(started.agent)
@@ -246,7 +256,65 @@ function M.open_window()
         M.agent = name
         notify("Claude started but is blocked — finish setup in " .. pane, vim.log.levels.WARN)
       else
-        notify("agent start failed: " .. ((start_err and (start_err.message or start_err.code)) or "unknown"), vim.log.levels.ERROR)
+        notify(
+          "agent start failed: " .. ((start_err and (start_err.message or start_err.code)) or "unknown"),
+          vim.log.levels.ERROR
+        )
+      end
+    end)
+  end)
+end
+
+-- Put a second view of *our* Claude beside this editor, to read along while
+-- editing. No new agent: `agent attach` mirrors the existing terminal, so both
+-- views drive the same session. ctrl+b q detaches and takes the pane with it.
+--
+-- `agent attach` is an interactive client, not a socket API call — it renders
+-- into whatever terminal it is run from and never returns JSON. So it has to be
+-- typed into the new pane's shell (`pane run`), not spawned by vim.system.
+function M.vertical_claude()
+  local target = resolve()
+  if not target then
+    notify("No Claude agent found; open one with <leader>cc first", vim.log.levels.WARN)
+    return
+  end
+
+  -- Split this nvim pane, so the mirror lands beside the buffer being read.
+  local res, err = herdr {
+    "pane",
+    "split",
+    "--current",
+    "--direction",
+    "right",
+    "--cwd",
+    vim.fn.getcwd(),
+    M.config.focus_on_open and "--focus" or "--no-focus",
+  }
+  if not res then
+    notify("pane split failed: " .. ((err and (err.message or err.code)) or "unknown"), vim.log.levels.ERROR)
+    return
+  end
+
+  local pane = res.pane and res.pane.pane_id
+  if not pane then
+    notify("pane split returned no pane", vim.log.levels.ERROR)
+    return
+  end
+
+  -- `pane run` types the command and Enter, so the shell has to be at its own
+  -- prompt first — same race `agent start` loses in M.open_window. `exec` hands
+  -- the pane's only process over to the attach client, so detaching exits the
+  -- pane instead of dropping back to a leftover shell prompt.
+  await_shell(pane, vim.uv.now() + M.config.shell_timeout_ms, function(ready)
+    if not ready then
+      notify("Shell in " .. pane .. " never reached a prompt", vim.log.levels.ERROR)
+      return
+    end
+    herdr_async({ "pane", "run", pane, "exec", "herdr", "agent", "attach", target }, function(_, run_err)
+      if run_err then
+        notify("pane run failed: " .. (run_err.message or run_err.code), vim.log.levels.ERROR)
+      else
+        notify("Mirroring " .. target .. " in " .. pane .. " — ctrl+b q to close")
       end
     end)
   end)
@@ -261,7 +329,9 @@ function M.status()
   end
   local res = herdr { "agent", "get", target }
   local a = res and res.agent
-  notify(("%s — %s @ %s (%s)"):format(target, a and a.agent_status or "?", a and a.pane_id or "?", a and a.tab_id or "?"))
+  notify(
+    ("%s — %s @ %s (%s)"):format(target, a and a.agent_status or "?", a and a.pane_id or "?", a and a.tab_id or "?")
+  )
 end
 
 return M

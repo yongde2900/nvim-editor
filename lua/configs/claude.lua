@@ -154,6 +154,14 @@ local function send_to_claude(prompt)
   vim.cmd "'<,'>ClaudeCodeSend"
 end
 
+-- Split pane and attach to current Claude session (detaching closes the pane)
+function M.vertical_cluade()
+  local b = backend()
+  if b and M.backend_name == "herdr" then
+    b.vertical_claude()
+  end
+end
+
 function M.send_selection() send_to_claude(nil) end
 function M.review()        send_to_claude(prompts.review) end
 function M.optimize()      send_to_claude(prompts.optimize) end

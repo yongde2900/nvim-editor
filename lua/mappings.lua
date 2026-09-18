@@ -164,6 +164,7 @@ map("v", "<leader>ct", claude.test, { desc = "test selection to Claude Code" })
 -- Open Claude Code in a new tab of the current Herdr workspace (or focus it)
 map("n", "<leader>cc", claude.open_window, { desc = "Open Claude Code in a Herdr tab" })
 map("n", "<leader>cS", claude.status, { desc = "Claude Code agent status" })
+map("n", "<leader>cv", claude.vertical_cluade, { desc = "attache current claude session, just for herdr" })
 -- vim.api.nvim_create_user_command("Claude", claude.open_window, { desc = "Open Claude Code in a new Ghostty window" })
 
 -- place this in one of your configuration file(s)
