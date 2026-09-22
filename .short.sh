@@ -6,6 +6,8 @@ alias gott="gotestsum"
 alias lg="lazygit"
 alias ghcp="gh pr create --web"
 alias ghrp="gh repo view --web"
+alias pl="sh ~/player_launch.sh"
+alias ppl="ENV=prd sh ~/player_launch.sh"
  
 
 
